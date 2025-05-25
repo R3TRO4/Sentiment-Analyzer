@@ -23,7 +23,7 @@ if st.button("Analizuj sentyment"):
 
         if review_text:
             label, score = model.analyze(review_text)
-            db.update_data(db.cursor, label, score, review_id)
+            db.update_data_score_and_label(db.cursor, label, score, review_id)
 
     st.success("Analiza zakończona ✅")
 

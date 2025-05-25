@@ -23,6 +23,13 @@ class ReviewDatabase:
         cursor.execute("SELECT * FROM reviews")
         return cursor.fetchall()
 
+    def insert_own_review(self, cursor, review):
+        cursor.execute(
+            "INSERT INTO reviews (REVIEW) VALUES (?)",
+            (review,)
+        )
+        print("\nNew review has been inserted.")
+
     def insert_data(self, cursor):
         cursor.execute(
             "INSERT INTO reviews (REVIEW) VALUES (?)",
@@ -39,10 +46,35 @@ class ReviewDatabase:
         print('Data has been inserted.')
 
     def delete_data(self, cursor, review_id):
-        cursor.execute("DELETE FROM reviews WHERE FIND = ?", (review_id,))
-        print(f'Review with ID {review_id} has been deleted.')
+        cursor.execute(
+            "SELECT 1 FROM reviews WHERE FIND = ?",
+            (review_id,)
+        )
+        result = cursor.fetchone()
+        if result:
+            cursor.execute(
+                "DELETE FROM reviews WHERE FIND = ?", (review_id,)
+            )
+            print(f'Review with ID {review_id} has been deleted.')
+        else:
+            print(f'Review with ID {review_id} was not found.')
 
-    def update_data(self, cursor, label, score, review_id):
+    def update_data_review(self, cursor, new_review, review_id):
+        cursor.execute(
+            "SELECT 1 FROM reviews WHERE FIND = ?",
+            (review_id,)
+        )
+        result = cursor.fetchone()
+        if result:
+            cursor.execute(
+                "UPDATE reviews SET REVIEW = ? WHERE FIND = ?",
+                (new_review, review_id)
+            )
+            print(f'Review with ID {review_id} has been updated.')
+        else:
+            print(f'Review with ID {review_id} was not found.')
+
+    def update_data_score_and_label(self, cursor, label, score, review_id):
         cursor.execute(
             "UPDATE reviews SET LABEL = ?, SCORE = ? WHERE FIND = ? ",
             (label, score, review_id)
