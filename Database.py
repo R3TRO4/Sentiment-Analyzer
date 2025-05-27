@@ -3,91 +3,99 @@ import sqlite3
 
 class ReviewDatabase:
     def __init__(self, db_path='review_database.db'):
-        self.connection = sqlite3.connect(db_path)
-        self.cursor = self.connection.cursor()
-        print("Database has been initialized")
-        self.create_table(self.cursor)
-        self.insert_data(self.cursor)
+        self.db_path = db_path
+        self.conn = sqlite3.connect(self.db_path,
+                                    check_same_thread=False,
+                                    uri=True)
+        self.cursor = self.conn.cursor()
 
-    def create_table(self, cursor):
-        cursor.execute("""
+        print("Zainicjowano połączenie z bazą danych.")
+        self.create_table()
+        self.insert_data()
+        self.conn.commit()
+
+    def create_table(self):
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS reviews (
                 FIND INTEGER PRIMARY KEY AUTOINCREMENT,
                 REVIEW TEXT,
                 LABEL TEXT,
                 SCORE FLOAT
-            ) """)
-        print('Table reviews has been created.')
+            )
+        """)
 
-    def select_all_data(self, cursor):
-        cursor.execute("SELECT * FROM reviews")
-        return cursor.fetchall()
-
-    def insert_own_review(self, cursor, review):
-        cursor.execute(
-            "INSERT INTO reviews (REVIEW) VALUES (?)",
-            (review,)
-        )
-        print("\nNew review has been inserted.")
-
-    def insert_data(self, cursor):
-        cursor.execute(
+    def insert_data(self):
+        self.cursor.execute(
             "INSERT INTO reviews (REVIEW) VALUES (?)",
             ("To był świetny film!",)
         )
-        cursor.execute(
+        self.cursor.execute(
             "INSERT INTO reviews (REVIEW) VALUES (?)",
             ("To był beznadziejny film!",)
         )
-        cursor.execute(
+        self.cursor.execute(
             "INSERT INTO reviews (REVIEW) VALUES (?)",
             ("To był w porządku film.",)
         )
-        print('Data has been inserted.')
 
-    def delete_data(self, cursor, review_id):
-        cursor.execute(
+    def insert_own_review(self, review):
+        self.cursor.execute(
+            "INSERT INTO reviews (REVIEW) VALUES (?)",
+            (review,))
+        self.conn.commit()
+        print("✅ Recenzja została dodana.")
+
+    def select_all_data(self):
+        self.cursor.execute("SELECT * FROM reviews")
+        return self.cursor.fetchall()
+
+    def delete_data(self, review_id):
+        self.cursor.execute(
             "SELECT 1 FROM reviews WHERE FIND = ?",
             (review_id,)
         )
-        result = cursor.fetchone()
-        if result:
-            cursor.execute(
-                "DELETE FROM reviews WHERE FIND = ?", (review_id,)
+        if self.cursor.fetchone():
+            self.cursor.execute(
+                "DELETE FROM reviews WHERE FIND = ?",
+                (review_id,)
             )
-            print(f'Review with ID {review_id} has been deleted.')
+            self.conn.commit()
+            print(f"🗑️ Recenzja {review_id} została usunięta.")
+            return True
         else:
-            print(f'Review with ID {review_id} was not found.')
+            print(f"Nie znaleziono recenzji o ID {review_id}")
+            return False
 
-    def update_data_review(self, cursor, new_review, review_id):
-        cursor.execute(
+    def update_data_review(self, new_review, review_id):
+        self.cursor.execute(
             "SELECT 1 FROM reviews WHERE FIND = ?",
             (review_id,)
         )
-        result = cursor.fetchone()
-        if result:
-            cursor.execute(
+        if self.cursor.fetchone():
+            self.cursor.execute(
                 "UPDATE reviews SET REVIEW = ? WHERE FIND = ?",
                 (new_review, review_id)
             )
-            print(f'Review with ID {review_id} has been updated.')
+            self.conn.commit()
+            print(f"✅ Recenzja {review_id} została zaktualizowana.")
+            return True
         else:
-            print(f'Review with ID {review_id} was not found.')
+            print(f"Nie znaleziono recenzji o ID {review_id}")
+            return False
 
-    def update_data_score_and_label(self, cursor, label, score, review_id):
-        cursor.execute(
-            "UPDATE reviews SET LABEL = ?, SCORE = ? WHERE FIND = ? ",
+    def update_data_score_and_label(self, label, score, review_id):
+        self.cursor.execute(
+            "UPDATE reviews SET LABEL = ?, SCORE = ? WHERE FIND = ?",
             (label, score, review_id)
         )
+        self.conn.commit()
 
-    def select_one_review(self, cursor, review_id):
-        cursor.execute("SELECT REVIEW FROM reviews WHERE FIND=?", (review_id,))
-        return cursor.fetchone()
+    def select_one_review(self, review_id):
+        self.cursor.execute(
+            "SELECT REVIEW FROM reviews WHERE FIND = ?",
+            (review_id,))
+        return self.cursor.fetchone()
 
-    def commit_changes(self):
-        self.connection.commit()
-
-    def close(self, cursor, sqlite_connection):
-        sqlite_connection.commit()
-        cursor.close()
-        sqlite_connection.close()
+    def close(self):
+        self.cursor.close()
+        self.conn.close()

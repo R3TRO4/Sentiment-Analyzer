@@ -22,48 +22,46 @@ if __name__ == "__main__":
             case '1':
                 # Dodaj recenzję
                 review = input("Wpisz swoją recenzję: ")
-                db.insert_own_review(db.cursor, review)
-                db.commit_changes()
+                db.insert_own_review(review)
 
             case '2':
                 # wyświetl
-                rows = db.select_all_data(db.cursor)
+                rows = db.select_all_data()
                 for row in rows:
                     print(row)
 
             case '3':
                 # usuń
                 review_id = input("Podaj ID recenzji do usunięcia: ")
-                db.delete_data(db.cursor, int(review_id))
-                db.commit_changes()
+                db.delete_data(int(review_id))
 
             case '4':
                 # edytuj
                 review_id = input("Podaj ID recenzji do edycji: ")
                 new_review = input("Wpisz nową treść recenzji: ")
-                db.update_data_review(db.cursor, new_review, review_id)
-                db.commit_changes()
+                db.update_data_review(new_review, review_id)
 
             case '5':
                 # analiza
                 print("Rozpoczęto analizę...")
-                reviews = db.select_all_data(db.cursor)
+                reviews = db.select_all_data()
 
                 # pętla po recenzjach
                 for review in reviews:
                     # ID iterowanej recenzji
                     review_id = review[0]
                     # Pobranie recenzji o konkretnym ID
-                    review_row = db.select_one_review(db.cursor, review_id)
+                    review_row = db.select_one_review(review_id)
 
                     if review_row:
                         # Analiza sentymentu recenzji
                         label, score = model.analyze(review_row[0])
-                        print(f'Recenzja {review_id} o treści: {review_row}, wniosek: {label}, ocena: {score}')
+                        print(f'Recenzja {review_id} '
+                              f'o treści: {review_row}, '
+                              f'wniosek: {label}, '
+                              f'ocena: {score}')
                         # Zapisanie wyników analizy sentymentu do bazy danych
-                        db.update_data_score_and_label(db.cursor, label, score, review_id)
-                        # Zacommitowanie zmian
-                        db.commit_changes()
+                        db.update_data_score_and_label(label, score, review_id)
 
                     else:
                         # Jeśli nie ma takiej recenzji
@@ -71,6 +69,5 @@ if __name__ == "__main__":
 
             case '6':
                 # wyjście
-                print("Koniec działania programu")
-                db.close()
+                print("Koniec działania programu.")
                 break
