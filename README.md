@@ -22,7 +22,6 @@ Jest testowany przy użyciu `pytest`, a interfejs webowy został zbudowany z wyk
     ```
     Po uruchomieniu interfejs Gradio będzie dostępny pod adresem https://localhost:7860 (domyślny port Gradio)
 
-
 3. **Uruchomienie aplikacji w konsoli (opcjonalnie)**
     
     Aby uruchomić aplikację w konsoli zamiast w interfejsie Gradio, wystarczy wykonać komendę:
@@ -35,7 +34,7 @@ Jest testowany przy użyciu `pytest`, a interfejs webowy został zbudowany z wyk
 
 1. **Budowanie obrazu Dockera**
 
-    W katalogu głównym projektu (tam gdzie znajduje się Dockerfile) uruchom komendę:
+    W katalogu głównym projektu (tam, gdzie znajduje się Dockerfile) uruchom komendę:
 
     ```bash
     docker build -t <tag-obrazu>
@@ -61,14 +60,13 @@ Jest testowany przy użyciu `pytest`, a interfejs webowy został zbudowany z wyk
     ```
     Aplikacja będzie dostępna w przeglądarce pod adresem: http://localhost:7860
 
-
 3. **Podstawowe komendy Dockera**
     
-    Aby wyświetlić listę wszystkich obrazów zapisanych lokalnie na Twoim systemie użyj komendy:
+    Aby wyświetlić listę wszystkich obrazów zapisanych lokalnie na Twoim systemie, użyj komendy:
     ``` bash
     docker images
     ```
-    Aby wyświetlić listę wszystkich kontenerów, zarówno tych działających jak i zatrzymanych użyj komendy:
+    Aby wyświetlić listę wszystkich kontenerów, zarówno tych działających, jak i zatrzymanych użyj komendy:
     
     ``` bash
     docker ps -a
@@ -79,7 +77,27 @@ Jest testowany przy użyciu `pytest`, a interfejs webowy został zbudowany z wyk
     docker rm <id-kontenera>
     ```
    
-    Aby usunąć obraz użyj komendy:
+    Aby usunąć obraz, użyj komendy:
     ``` bash
    docker rmi <tag-obrazu>
    ```
+   
+## Uruchamianie testów
+
+1. **Uruchomienie wszystkich testów**
+   
+   Aby uruchomić wszystkie testy, należy w głównym katalogu projektu użyć komendy, która odniesie się do całego katalogu:
+
+   ```bash
+      pytest tests/
+   ```
+   
+2. **Uruchomienie pojedynczego testu**
+
+   Aby uruchomić pojedynczy test, należy odnieść się do pojedynczego pliku testowego za pomocą komendy
+
+   ```bash
+      pytest tests/<nazwa-testu>.py
+   ```
+
+
